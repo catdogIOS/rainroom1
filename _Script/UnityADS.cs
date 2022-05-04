@@ -52,16 +52,24 @@ public class UnityADS : MonoBehaviour
 
     public void ShowRewardedAd()
     {
-        init_i = 0;
-        if (Advertisement.IsReady("Rewarded_iOS"))
+        if (PlayerPrefs.GetInt("talk", 5) >= 5)
         {
-            ShowOptions options = new ShowOptions { resultCallback = HandleShowResult };
-            Advertisement.Show("Rewarded_iOS", options);
+            Toast_obj.SetActive(true);
+            adPop_txt.text = "대화 횟수가 이미 최대값이라" + "\n" + "시청할 수 없다.";
         }
         else
         {
-            Toast_obj.SetActive(true);
-            adPop_txt.text = "아직 볼 수 없다." + "\n" + " 나중에 시도해보자.";
+            init_i = 0;
+            if (Advertisement.IsReady("Rewarded_iOS"))
+            {
+                ShowOptions options = new ShowOptions { resultCallback = HandleShowResult };
+                Advertisement.Show("Rewarded_iOS", options);
+            }
+            else
+            {
+                Toast_obj.SetActive(true);
+                adPop_txt.text = "아직 볼 수 없다." + "\n" + " 나중에 시도해보자.";
+            }
         }
     }
 
@@ -286,6 +294,8 @@ public class UnityADS : MonoBehaviour
             {
                 PlayerPrefs.SetInt("outtimecut", 4);
                 cutTime_btn.interactable = false;
+                Toast_obj.SetActive(true);
+                adPop_txt.text = "외출하는데 필요한 시간이 감소되었다.";
             }
         }
     }
