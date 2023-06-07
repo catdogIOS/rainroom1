@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.UI;
 
-public class UnityADS : MonoBehaviour
+public class UnityADS : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener, IUnityAdsInitializationListener
 {
 
-    private string gameId = "4270906";//★ Window > Services 설정 테스트 바꿀것 (test용 1486550) //3657850
+    private string gameId = "4270906";//★ Window > Services 설정 테스트 바꿀것 (test용 1486550)4270906
     public int soundck;
     public GameObject ad_obj, radio_ani, adBtn_obj;
 
@@ -19,6 +19,8 @@ public class UnityADS : MonoBehaviour
 
     //스프라이트 이미지로 변경
     public Sprite radioMove1_spr, radioMove2_spr;
+
+    public string _adUnitId = "Rewarded_iOS";
 
 
 
@@ -32,6 +34,11 @@ public class UnityADS : MonoBehaviour
 
     public int init_i;
 
+    private void Awake()
+    {
+        Advertisement.Initialize(gameId, false, this);//true 테스트모드 **false로 꼭 변경할 ㄱ**
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -44,8 +51,7 @@ public class UnityADS : MonoBehaviour
         }
         color = new Color(1f, 1f, 1f);
 
-
-        Advertisement.Initialize(gameId, false); //true 테스트모드 **false로 꼭 변경할 ㄱ**
+        LoadAd();
     }
 
     // Update is called once per frame
@@ -60,33 +66,70 @@ public class UnityADS : MonoBehaviour
         else
         {
             init_i = 0;
-            if (Advertisement.IsReady("Rewarded_iOS"))
-            {
-                ShowOptions options = new ShowOptions { resultCallback = HandleShowResult };
-                Advertisement.Show("Rewarded_iOS", options);
-            }
-            else
-            {
-                Toast_obj.SetActive(true);
-                adPop_txt.text = "아직 볼 수 없다." + "\n" + " 나중에 시도해보자.";
-            }
+                Advertisement.Show("Rewarded_iOS", this);
+            
+            
         }
     }
 
     public void ShowRewardedAd2()
     {
         init_i = 2;
-        if (Advertisement.IsReady("Rewarded_iOS"))
+            Advertisement.Show("Rewarded_iOS", this);
+        
+        
+        
+        
+    }
+
+
+    public void OnUnityAdsShowFailure(string placementId, UnityAdsShowError error, string message)
+    {
+        Toast_obj.SetActive(true);
+        adPop_txt.text = "아직 볼 수 없다." + "\n" + " 나중에 시도해보자.";
+        LoadAd();
+    }
+
+
+    public void OnUnityAdsShowComplete(string adUnitId, UnityAdsShowCompletionState showCompletionState)
+    {
+        if (adUnitId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
         {
-            ShowOptions options = new ShowOptions { resultCallback = HandleShowResult };
-            Advertisement.Show("Rewarded_iOS", options);
-        }
-        else
-        {
-            Toast_obj.SetActive(true);
-            adPop_txt.text = "아직 볼 수 없다." + "\n" + " 나중에 시도해보자.";
+
+            if (init_i == 0)
+            {
+                lastDateTimenow = System.DateTime.Now;
+                if (PlayerPrefs.GetInt("scene", 0) == 2)
+                {
+                    PlayerPrefs.SetString("adtimespark", lastDateTimenow.ToString());
+                }
+                else if (PlayerPrefs.GetInt("scene", 0) == 3)
+                {
+                    PlayerPrefs.SetString("adtimescity", lastDateTimenow.ToString());
+                }
+                else if (PlayerPrefs.GetInt("scene", 0) == 0)
+                {
+                    PlayerPrefs.SetString("adtimes", lastDateTimenow.ToString());
+                }
+                else
+                {
+                    PlayerPrefs.SetString("adtimes", lastDateTimenow.ToString());
+                }
+                GM.GetComponent<ShowAds>().AdReward();
+                PlayerPrefs.SetInt("talk", 5);
+            }
+            else if (init_i == 2)
+            {
+                PlayerPrefs.SetInt("outtimecut", 4);
+                cutTime_btn.interactable = false;
+                Toast_obj.SetActive(true);
+                adPop_txt.text = "외출하는데 필요한 시간이 감소되었다.";
+            }
+
+            Advertisement.Load(_adUnitId, this);
         }
     }
+
 
     public void adYN()
     {
@@ -268,36 +311,40 @@ public class UnityADS : MonoBehaviour
         if (result == ShowResult.Finished)
         { 
 
-            if (init_i == 0)
-            {
-                lastDateTimenow = System.DateTime.Now;
-                if (PlayerPrefs.GetInt("scene", 0) == 2)
-                {
-                    PlayerPrefs.SetString("adtimespark", lastDateTimenow.ToString());
-                }
-                else if (PlayerPrefs.GetInt("scene", 0) == 3)
-                {
-                    PlayerPrefs.SetString("adtimescity", lastDateTimenow.ToString());
-                }
-                else if (PlayerPrefs.GetInt("scene", 0) == 0)
-                {
-                    PlayerPrefs.SetString("adtimes", lastDateTimenow.ToString());
-                }
-                else
-                {
-                    PlayerPrefs.SetString("adtimes", lastDateTimenow.ToString());
-                }
-                GM.GetComponent<ShowAds>().AdReward();
-                PlayerPrefs.SetInt("talk", 5);
-            }
-            else if (init_i == 2)
-            {
-                PlayerPrefs.SetInt("outtimecut", 4);
-                cutTime_btn.interactable = false;
-                Toast_obj.SetActive(true);
-                adPop_txt.text = "외출하는데 필요한 시간이 감소되었다.";
-            }
         }
     }
 
+    // Load content to the Ad Unit:
+    public void LoadAd()
+    {
+        // IMPORTANT! Only load content AFTER initialization (in this example, initialization is handled in a different script).
+        Debug.Log("Loading Ad: " + _adUnitId);
+        Advertisement.Load(_adUnitId, this);
+    }
+
+    public void OnUnityAdsAdLoaded(string placementId)
+    {
+    }
+
+    public void OnUnityAdsFailedToLoad(string placementId, UnityAdsLoadError error, string message)
+    {
+    }
+
+
+    public void OnUnityAdsShowStart(string placementId)
+    {
+    }
+
+    public void OnUnityAdsShowClick(string placementId)
+    {
+    }
+
+
+    public void OnInitializationComplete()
+    {
+    }
+
+    public void OnInitializationFailed(UnityAdsInitializationError error, string message)
+    {
+    }
 }
