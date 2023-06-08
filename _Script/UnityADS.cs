@@ -305,20 +305,12 @@ public class UnityADS : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListe
 
     }
 
-    //시청보상
-    public void HandleShowResult(ShowResult result)
-    {
-        if (result == ShowResult.Finished)
-        { 
-
-        }
-    }
 
     // Load content to the Ad Unit:
     public void LoadAd()
     {
         // IMPORTANT! Only load content AFTER initialization (in this example, initialization is handled in a different script).
-        Debug.Log("Loading Ad: " + _adUnitId);
+        //Debug.Log("Loading Ad: " + _adUnitId);
         Advertisement.Load(_adUnitId, this);
     }
 
