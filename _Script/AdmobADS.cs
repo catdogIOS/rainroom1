@@ -48,26 +48,14 @@ public class AdmobADS : MonoBehaviour {
         }
         color = new Color(1f, 1f, 1f);
 
-#if UNITY_ANDROID
-        string appId = "ca-app-pub-9179569099191885~5921342761"; //테스트용ca-app-pub-3940256099942544~3347511713
-#elif UNITY_IPHONE
-            string adUnitId = "ca-app-pub-9179569099191885~1168848531";
-#else
-        string appId = "unexpected_platform";
-#endif
 
 
-        this.RequestRewardedVideo();
+        //this.RequestRewardedVideo();
         //this.RequestInterstitial();
 
 }
 
 
-    //동영상닫음
-    private void HandleRewardedAdClosed(object sender, System.EventArgs args)
-    {
-        RequestRewardedVideo();
-    }
 
 
     //배너
@@ -97,13 +85,6 @@ public class AdmobADS : MonoBehaviour {
     private void RequestRewardedVideo()
     {
 
-#if UNITY_ANDROID
-            adUnitIdvideo = "ca-app-pub-9179569099191885/8650861151"; // 테스트 ca-app-pub-3940256099942544/1712485313
-#elif UNITY_IPHONE
-        adUnitIdvideo = "ca-app-pub-3940256099942544/1712485313"; ///ㅊㅔ스츠영상넣어짐
-#else
-        adUnitIdvideo = "unexpected_platform";
-#endif
 
 
      //   this.rewardedAd = new RewardedAd(adUnitIdvideo);
@@ -147,11 +128,6 @@ public class AdmobADS : MonoBehaviour {
     }
     */
 
-    //동영상닫음
-    private void HandleRewardBasedVideoClosed(object sender, System.EventArgs args)
-    {
-        this.RequestRewardedVideo();
-    }
 
     public void showAdmobVideo()
     {/*

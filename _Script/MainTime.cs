@@ -91,6 +91,7 @@ public class MainTime : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         PlayerPrefs.SetInt("gudocgetonce", 1);
         if (PlayerPrefs.GetInt("titlecheck", 0) == 1)
@@ -102,24 +103,33 @@ public class MainTime : MonoBehaviour
 
         PlayerPrefs.SetInt("scene", 0);
 
-        //구독전단버튼시간태그로불러오기
 
-        if (PlayerPrefs.GetInt("scene", 0) == 0)
+        try
         {
+            //구독전단버튼시간태그로불러오기
 
-            GameObject.Find("메뉴펼치기").transform.Find("메뉴목록").gameObject.SetActive(true);
+            if (PlayerPrefs.GetInt("scene", 0) == 0)
+            {
 
-            g = GameObject.FindGameObjectWithTag("구독");
-            btn_gudoc = g.GetComponent<Button>();
-            g = GameObject.FindGameObjectWithTag("구독T");
-            txt_gudoc = g.GetComponent<Text>();
-            g = GameObject.FindGameObjectWithTag("전단");
-            btn_paper = g.GetComponent<Button>();
-            g = GameObject.FindGameObjectWithTag("전단T");
-            txt_paper = g.GetComponent<Text>();
+                GameObject.Find("메뉴펼치기").transform.Find("메뉴목록").gameObject.SetActive(true);
 
-            GameObject.Find("메뉴펼치기").transform.Find("메뉴목록").gameObject.SetActive(false);
+                g = GameObject.FindGameObjectWithTag("구독");
+                btn_gudoc = g.GetComponent<Button>();
+                g = GameObject.FindGameObjectWithTag("구독T");
+                txt_gudoc = g.GetComponent<Text>();
+                g = GameObject.FindGameObjectWithTag("전단");
+                btn_paper = g.GetComponent<Button>();
+                g = GameObject.FindGameObjectWithTag("전단T");
+                txt_paper = g.GetComponent<Text>();
+
+                GameObject.Find("메뉴펼치기").transform.Find("메뉴목록").gameObject.SetActive(false);
+            }
         }
+        catch (System.Exception ex)
+        {
+            //error
+        }
+
 
         gmoveY = gobok.transform.position.y;
         gmoveX = gobok.transform.position.y;
@@ -131,19 +141,24 @@ public class MainTime : MonoBehaviour
 
         talk = PlayerPrefs.GetInt("talk", 5);
 
-
-
-        //카메라
-        camera_c = Camera.main;
-        menu_obj = GameObject.FindGameObjectWithTag("메뉴Canvas");
-        menu_obj.GetComponent<Canvas>().worldCamera = camera_c;
+        
+        try
+        {
+            //카메라
+            camera_c = Camera.main;
+            menu_obj = GameObject.FindGameObjectWithTag("메뉴Canvas");
+            menu_obj.GetComponent<Canvas>().worldCamera = camera_c;
+        }
+        catch (System.Exception ex)
+        {
+            //error
+        }
 
 
         if (PlayerPrefs.GetInt("allTrash", 0) == 99)
         {
             PlayerPrefs.SetInt("backHomeTrash", 999);
         }
-
 
     }
 
