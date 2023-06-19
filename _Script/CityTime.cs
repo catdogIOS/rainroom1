@@ -65,6 +65,7 @@ public class CityTime : MonoBehaviour
             talk = 4;
         }
         PlayerPrefs.SetInt("talk", talk);
+        PlayerPrefs.Save();
     }
 
 

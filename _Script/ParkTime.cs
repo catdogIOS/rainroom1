@@ -184,6 +184,7 @@ public class ParkTime : MonoBehaviour
             talk = 4;
         }
         PlayerPrefs.SetInt("talk", talk);
+        PlayerPrefs.Save();
     }
 
     void Baquitrash()
