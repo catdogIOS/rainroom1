@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.UI;
+using Unity.Services.LevelPlay;
 
-public class UnityADS : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener, IUnityAdsInitializationListener
+public class UnityADS : MonoBehaviour
 {
 
+    string appKey = "223708d4d";
     private string gameId = "4270906";//★ Window > Services 설정 테스트 바꿀것 (test용 1486550)4270906
     public int soundck;
     public GameObject ad_obj, radio_ani, adBtn_obj;
@@ -34,14 +36,20 @@ public class UnityADS : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListe
 
     public int init_i;
 
-    private void Awake()
-    {
-        Advertisement.Initialize(gameId, false, this);//true 테스트모드 **false로 꼭 변경할 ㄱ**
-    }
-
     // Use this for initialization
     void Start()
     {
+        
+        //Debug.Log("UnityADS광고_스타트");
+        IronSource.Agent.validateIntegration();
+
+        LevelPlay.Init(appKey, adFormats: new[] { com.unity3d.mediation.LevelPlayAdFormat.REWARDED });
+
+        LevelPlay.OnInitSuccess -= SdkInitializationCompletedEvent;
+        LevelPlay.OnInitFailed -= SdkInitializationFailedEvent;
+        LevelPlay.OnInitSuccess += SdkInitializationCompletedEvent;
+        LevelPlay.OnInitFailed += SdkInitializationFailedEvent;
+
 
 
         if (PlayerPrefs.GetInt("outtimecut", 4) == 4 && PlayerPrefs.GetInt("scene", 0) == 0)
@@ -51,10 +59,117 @@ public class UnityADS : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListe
         }
         color = new Color(1f, 1f, 1f);
 
-        LoadAd();
+    }
+    
+
+    private void OnDisable()
+    {
+        //Debug.Log("UnityADS광고_OnDisable");
+        LevelPlay.OnInitSuccess -= SdkInitializationCompletedEvent;
+        LevelPlay.OnInitFailed -= SdkInitializationFailedEvent;
+
+        //Add ImpressionSuccess Event
+        IronSourceEvents.onImpressionDataReadyEvent -= ImpressionDataReadyEvent;
+
+        //Add AdInfo Rewarded Video Events
+        IronSourceRewardedVideoEvents.onAdOpenedEvent -= RewardedVideoOnAdOpenedEvent;
+        IronSourceRewardedVideoEvents.onAdClosedEvent -= RewardedVideoOnAdClosedEvent;
+        IronSourceRewardedVideoEvents.onAdAvailableEvent -= RewardedVideoOnAdAvailable;
+        IronSourceRewardedVideoEvents.onAdUnavailableEvent -= RewardedVideoOnAdUnavailable;
+        IronSourceRewardedVideoEvents.onAdShowFailedEvent -= RewardedVideoOnAdShowFailedEvent;
+        IronSourceRewardedVideoEvents.onAdRewardedEvent -= RewardedVideoOnAdRewardedEvent;
+        IronSourceRewardedVideoEvents.onAdClickedEvent -= RewardedVideoOnAdClickedEvent;
     }
 
-    // Update is called once per frame
+    void EnableAds()
+    {
+        //Debug.Log("UnityADS광고_EnableAds");
+        //Add ImpressionSuccess Event
+        IronSourceEvents.onImpressionDataReadyEvent -= ImpressionDataReadyEvent;
+
+        //Add AdInfo Rewarded Video Events
+        IronSourceRewardedVideoEvents.onAdOpenedEvent -= RewardedVideoOnAdOpenedEvent;
+        IronSourceRewardedVideoEvents.onAdClosedEvent -= RewardedVideoOnAdClosedEvent;
+        IronSourceRewardedVideoEvents.onAdAvailableEvent -= RewardedVideoOnAdAvailable;
+        IronSourceRewardedVideoEvents.onAdUnavailableEvent -= RewardedVideoOnAdUnavailable;
+        IronSourceRewardedVideoEvents.onAdShowFailedEvent -= RewardedVideoOnAdShowFailedEvent;
+        IronSourceRewardedVideoEvents.onAdRewardedEvent -= RewardedVideoOnAdRewardedEvent;
+        IronSourceRewardedVideoEvents.onAdClickedEvent -= RewardedVideoOnAdClickedEvent;
+
+        //Add ImpressionSuccess Event
+        IronSourceEvents.onImpressionDataReadyEvent += ImpressionDataReadyEvent;
+
+        //Add AdInfo Rewarded Video Events
+        IronSourceRewardedVideoEvents.onAdOpenedEvent += RewardedVideoOnAdOpenedEvent;
+        IronSourceRewardedVideoEvents.onAdClosedEvent += RewardedVideoOnAdClosedEvent;
+        IronSourceRewardedVideoEvents.onAdAvailableEvent += RewardedVideoOnAdAvailable;
+        IronSourceRewardedVideoEvents.onAdUnavailableEvent += RewardedVideoOnAdUnavailable;
+        IronSourceRewardedVideoEvents.onAdShowFailedEvent += RewardedVideoOnAdShowFailedEvent;
+        IronSourceRewardedVideoEvents.onAdRewardedEvent += RewardedVideoOnAdRewardedEvent;
+        IronSourceRewardedVideoEvents.onAdClickedEvent += RewardedVideoOnAdClickedEvent;
+    }
+    void OnApplicationPause(bool isPaused)
+    {
+        //Debug.Log("unity-script: OnApplicationPause = " + isPaused);
+        IronSource.Agent.onApplicationPause(isPaused);
+    }
+
+
+    void RewardedVideoOnAdOpenedEvent(IronSourceAdInfo adInfo)
+    {
+        //Debug.Log("unity-script: I got RewardedVideoOnAdOpenedEvent With AdInfo " + adInfo);
+    }
+
+
+    void RewardedVideoOnAdAvailable(IronSourceAdInfo adInfo)
+    {
+        //Debug.Log("unity-script: I got RewardedVideoOnAdAvailable With AdInfo " + adInfo);
+    }
+
+    void RewardedVideoOnAdUnavailable()
+    {
+        //Debug.Log("unity-script: I got RewardedVideoOnAdUnavailable");
+    }
+
+    void RewardedVideoOnAdShowFailedEvent(IronSourceError ironSourceError, IronSourceAdInfo adInfo)
+    {
+        Toast_obj.SetActive(true);
+        adPop_txt.text = "아직 볼 수 없다." + "\n" + " 나중에 시도해보자.";
+    }
+
+
+
+    void RewardedVideoOnAdClickedEvent(IronSourcePlacement ironSourcePlacement, IronSourceAdInfo adInfo)
+    {
+        //Debug.Log("unity-script: I got RewardedVideoOnAdClickedEvent With Placement" + ironSourcePlacement + "And AdInfo " + adInfo);
+    }
+
+
+
+    void SdkInitializationCompletedEvent(LevelPlayConfiguration config)
+    {
+        //Debug.Log("unity-script: I got SdkInitializationCompletedEvent with config: " + config);
+        EnableAds();
+    }
+
+    void SdkInitializationFailedEvent(LevelPlayInitError error)
+    {
+        //Debug.Log("unity-script: I got SdkInitializationFailedEvent with error: " + error);
+    }
+
+    void ImpressionDataReadyEvent(IronSourceImpressionData impressionData)
+    {
+        //Debug.Log("unity - script: I got ImpressionDataReadyEvent ToString(): " + impressionData.ToString());
+        //Debug.Log("unity - script: I got ImpressionDataReadyEvent allData: " + impressionData.allData);
+    }
+
+
+    void RewardedVideoOnAdClosedEvent(IronSourceAdInfo adInfo)
+    {
+        //Debug.Log("닫기 이벤트 UnityADS");
+    }
+
+
 
     public void ShowRewardedAd()
     {
@@ -66,38 +181,39 @@ public class UnityADS : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListe
         else
         {
             init_i = 0;
-                Advertisement.Show("Rewarded_iOS", this);
-            
-            
+
+            if (IronSource.Agent.isRewardedVideoAvailable())
+            {
+                IronSource.Agent.showRewardedVideo("RewardTalk");
+            }
+            else
+            {
+            }
         }
     }
 
     public void ShowRewardedAd2()
     {
         init_i = 2;
-            Advertisement.Show("Rewarded_iOS", this);
-        
-        
-        
+            if (IronSource.Agent.isRewardedVideoAvailable())
+            {
+                IronSource.Agent.showRewardedVideo("RewardTalk");
+            }
+            else
+            {
+            }
         
     }
 
 
-    public void OnUnityAdsShowFailure(string placementId, UnityAdsShowError error, string message)
+    void RewardedVideoOnAdRewardedEvent(IronSourcePlacement ironSourcePlacement, IronSourceAdInfo adInfo)
     {
-        Toast_obj.SetActive(true);
-        adPop_txt.text = "아직 볼 수 없다." + "\n" + " 나중에 시도해보자.";
-        LoadAd();
-    }
-
-
-    public void OnUnityAdsShowComplete(string adUnitId, UnityAdsShowCompletionState showCompletionState)
-    {
-        if (adUnitId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
+        if (ironSourcePlacement.getPlacementName() == "RewardTalk")
         {
-
             if (init_i == 0)
             {
+
+                //Debug.Log("UnityADS광고_대화");
                 lastDateTimenow = System.DateTime.Now;
                 if (PlayerPrefs.GetInt("scene", 0) == 2)
                 {
@@ -120,13 +236,13 @@ public class UnityADS : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListe
             }
             else if (init_i == 2)
             {
+                //Debug.Log("UnityADS광고_외출");
                 PlayerPrefs.SetInt("outtimecut", 4);
                 cutTime_btn.interactable = false;
                 Toast_obj.SetActive(true);
                 adPop_txt.text = "외출하는데 필요한 시간이 감소되었다.";
             }
 
-            Advertisement.Load(_adUnitId, this);
         }
     }
 
@@ -305,38 +421,4 @@ public class UnityADS : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListe
 
     }
 
-
-    // Load content to the Ad Unit:
-    public void LoadAd()
-    {
-        // IMPORTANT! Only load content AFTER initialization (in this example, initialization is handled in a different script).
-        //Debug.Log("Loading Ad: " + _adUnitId);
-        Advertisement.Load(_adUnitId, this);
-    }
-
-    public void OnUnityAdsAdLoaded(string placementId)
-    {
-    }
-
-    public void OnUnityAdsFailedToLoad(string placementId, UnityAdsLoadError error, string message)
-    {
-    }
-
-
-    public void OnUnityAdsShowStart(string placementId)
-    {
-    }
-
-    public void OnUnityAdsShowClick(string placementId)
-    {
-    }
-
-
-    public void OnInitializationComplete()
-    {
-    }
-
-    public void OnInitializationFailed(UnityAdsInitializationError error, string message)
-    {
-    }
 }
