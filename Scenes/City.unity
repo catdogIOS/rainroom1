@@ -10254,6 +10254,8 @@ MonoBehaviour:
   cutTime_btn: {fileID: 0}
   GM: {fileID: 1119049935}
   init_i: 0
+  isMute: 0
+  se_back: {fileID: 299761404}
 --- !u!1 &1121742667
 GameObject:
   m_ObjectHideFlags: 0

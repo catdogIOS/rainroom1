@@ -11664,6 +11664,8 @@ MonoBehaviour:
   cutTime_btn: {fileID: 0}
   GM: {fileID: 2145333736}
   init_i: 0
+  isMute: 0
+  se_back: {fileID: 1891187079}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

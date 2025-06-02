@@ -35,6 +35,8 @@ public class UnityADS : MonoBehaviour
     public GameObject GM;
 
     public int init_i;
+    public bool isMute;
+    public AudioSource se_back;
 
     // Use this for initialization
     void Start()
@@ -117,7 +119,15 @@ public class UnityADS : MonoBehaviour
 
     void RewardedVideoOnAdOpenedEvent(IronSourceAdInfo adInfo)
     {
-        //Debug.Log("unity-script: I got RewardedVideoOnAdOpenedEvent With AdInfo " + adInfo);
+            if (se_back.mute)
+            {
+                isMute = true;
+            }
+            else
+            {
+                isMute = false;
+            }
+        se_back.mute = true;
     }
 
 
@@ -166,7 +176,11 @@ public class UnityADS : MonoBehaviour
 
     void RewardedVideoOnAdClosedEvent(IronSourceAdInfo adInfo)
     {
-        //Debug.Log("닫기 이벤트 UnityADS");
+        se_back.mute = false;
+        if (isMute)
+        {
+            se_back.mute = true;
+        }
     }
 
 

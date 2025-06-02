@@ -7033,6 +7033,8 @@ MonoBehaviour:
   cutTime_btn: {fileID: 1226738012}
   GM: {fileID: 300375158}
   init_i: 0
+  isMute: 0
+  se_back: {fileID: 641090323}
 --- !u!1 &301776945
 GameObject:
   m_ObjectHideFlags: 0
