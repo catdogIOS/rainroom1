@@ -41,7 +41,6 @@ public class UnityADS : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        
         //Debug.Log("UnityADS광고_스타트");
         IronSource.Agent.validateIntegration();
 
@@ -52,11 +51,8 @@ public class UnityADS : MonoBehaviour
         LevelPlay.OnInitSuccess += SdkInitializationCompletedEvent;
         LevelPlay.OnInitFailed += SdkInitializationFailedEvent;
 
-
-
         if (PlayerPrefs.GetInt("outtimecut", 4) == 4 && PlayerPrefs.GetInt("scene", 0) == 0)
         {
-
             cutTime_btn.interactable = false;
         }
         color = new Color(1f, 1f, 1f);
@@ -226,7 +222,6 @@ public class UnityADS : MonoBehaviour
         {
             if (init_i == 0)
             {
-
                 //Debug.Log("UnityADS광고_대화");
                 lastDateTimenow = System.DateTime.Now;
                 if (PlayerPrefs.GetInt("scene", 0) == 2)
@@ -256,7 +251,6 @@ public class UnityADS : MonoBehaviour
                 Toast_obj.SetActive(true);
                 adPop_txt.text = "외출하는데 필요한 시간이 감소되었다.";
             }
-
         }
     }
 
